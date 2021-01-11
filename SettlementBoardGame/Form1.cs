@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SettlementBoardGame
@@ -23,6 +17,9 @@ namespace SettlementBoardGame
         {
             // https://stackoverflow.com/questions/5507605/c-sharp-drawing-on-panels
             // https://web.archive.org/web/20120330003635/http://bobpowell.net/picturebox.htm
+
+            // https://swharden.com/CsharpDataVis/
+
             var p = sender as Panel;
             var g = e.Graphics;
 
@@ -35,14 +32,14 @@ namespace SettlementBoardGame
             points[2] = new Point(p.Width, p.Height);
             points[3] = new Point(p.Width, 0);
 
-            Brush brush = new SolidBrush(Color.Green);
+            Brush brush = new SolidBrush(Color.Aqua);
 
             g.FillPolygon(brush, points);
             // ~~~~~~~~~~~~~~~~~~~~~~~~~End of code from tutorial ~~~~~~~~~~~~~~~~~~~~~~
 
             double centerpointX = p.Width / 2;
             double centerpointY = p.Height / 2;
-            double edgeLength = 50;
+            double edgeLength = 100;
             Point[] hex = new Point[7];
 
             double x, y;
@@ -81,13 +78,21 @@ namespace SettlementBoardGame
 
             hex[6] = new Point(hex[0].X, hex[0].Y);
 
-            Brush b = new SolidBrush(Color.Aqua);
-
+            Brush b = new SolidBrush(Color.Green);
             g.FillPolygon(b, hex);
+            
+            
+            Brush c = new SolidBrush(Color.White);
+            double circleDiameter = 20;
+            double circleRadius = circleDiameter / 2.0;
+            g.FillEllipse(c, new Rectangle((int)(hex[0].X - circleRadius), (int)(hex[0].Y - circleDiameter / 2.0), (int)(circleDiameter), (int)(circleDiameter)));
+
+
         }
 
         private void draw_tile(Graphics g, Point[] points)
         {
+            Brush c = new SolidBrush(Color.White);
             Brush b = new SolidBrush(Color.Aqua);
             g.FillPolygon(b, points);
         }
