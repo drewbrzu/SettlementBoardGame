@@ -20,17 +20,54 @@ namespace SettlementBoardGameGUI
         }
         public void drawBoard()
         {
+            //gameCanvas.Children.Clear();
+            //double centerpointX = gameCanvas.Width / 2;
+            //double centerpointY = gameCanvas.Height / 2;
+            //drawHex(centerpointX, centerpointY);
+            var board = new Board(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2));
             gameCanvas.Children.Clear();
-            double centerpointX = gameCanvas.Width / 2;
-            double centerpointY = gameCanvas.Height / 2;
-            drawHex(centerpointX, centerpointY);
-            
+            foreach (var tile in board.tiles)
+            {
+                var col = Colors.Tan;
+                if(tile.resource == ResourceType.Lumber)
+                {
+                    col = Colors.Green;
+                }
+                else if(tile.resource == ResourceType.Brick)
+                {
+                    col = Colors.DarkRed;
+                }
+                else if (tile.resource == ResourceType.Wool)
+                {
+                    col = Colors.Gray;
+                }
+                else if (tile.resource == ResourceType.Grain)
+                {
+                    col = Colors.Goldenrod;
+                }
+                PointCollection pc = new PointCollection();
+                foreach (var pt in tile.vertices)
+                {
+                    pc.Add(new Point(pt.x, pt.y));
+                }
+                drawPolygon(pc, col);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    drawRoad(pc[i], pc[i + 1]);
+                }
+
+                //foreach (var pt in pc)
+                //{
+
+                //}
+            }
         }
-        public void drawPolygon(PointCollection points)
+        public void drawPolygon(PointCollection points, Color col)
         {
             Polygon hex = new Polygon();
             hex.Points = points;
-            hex.Fill = new SolidColorBrush(Colors.Green);
+            hex.Fill = new SolidColorBrush(col);
             gameCanvas.Children.Add(hex);
             // TODO: Add events for clicking/hovering over polygon.
         }
@@ -163,8 +200,8 @@ namespace SettlementBoardGameGUI
 
         private void pressMeButton_Click(object sender, RoutedEventArgs e)
         {
-            drawBoard();
 
+            
         }
     }
 }

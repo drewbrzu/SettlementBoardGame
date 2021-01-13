@@ -18,6 +18,9 @@ namespace SettlementBoardGameGUI
     {
         public Tile(ref Edge edge0, ref Edge edge1, ref Edge edge2, ref Edge edge3, ref Edge edge4, ref Edge edge5, ResourceType resource, int rollNumber)
         {
+            edges = new Edge[6];
+            vertices = new Vertex[6];
+
             edges[0] = edge0;
             edges[1] = edge1;
             edges[2] = edge2;
