@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,12 +21,11 @@ namespace SettlementBoardGameGUI
         }
         public void drawBoard()
         {
-            //gameCanvas.Children.Clear();
-            //double centerpointX = gameCanvas.Width / 2;
-            //double centerpointY = gameCanvas.Height / 2;
-            //drawHex(centerpointX, centerpointY);
             var board = new Board(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2));
             gameCanvas.Children.Clear();
+            List<Edge> roads = new List<Edge>();
+            List<Vertex> vertices = new List<Vertex>();
+
             foreach (var tile in board.tiles)
             {
                 var col = Colors.Tan;
@@ -51,16 +51,16 @@ namespace SettlementBoardGameGUI
                     pc.Add(new Point(pt.x, pt.y));
                 }
                 drawPolygon(pc, col);
+            }
 
-                for (int i = 0; i < 5; i++)
-                {
-                    drawRoad(pc[i], pc[i + 1]);
-                }
+            foreach(var road in board.edges)
+            {
+                drawRoad(new Point(road.point0.x, road.point0.y), new Point(road.point1.x, road.point1.y));
+            }
 
-                //foreach (var pt in pc)
-                //{
-
-                //}
+            foreach (var vertex in board.vertices)
+            {
+                drawVertex(new Point(vertex.x, vertex.y));
             }
         }
         public void drawPolygon(PointCollection points, Color col)
@@ -73,42 +73,42 @@ namespace SettlementBoardGameGUI
         }
         public void drawRoad(Point p1, Point p2)
         {
-            var rectWidth = 6;
-
+            var rectWidth = 10;
+            var xDiff = p2.X - p1.X;
+            var yDiff = p2.Y - p1.Y;
             var distanceBetweenPoints = Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
-            var angleRotation = Math.Asin((Math.Abs(p2.Y) - p1.Y) / distanceBetweenPoints) * (180 / Math.PI);
-            if (p2.X - p1.X < 0)
+            var angleRotation = Math.Asin(yDiff / distanceBetweenPoints);
+            var xDisp = Math.Sin(angleRotation) * rectWidth / 2;
+            var yDisp = Math.Cos(angleRotation) * rectWidth / 2;
+            var slope = (yDiff / xDiff);
+            if(xDiff < 0)
             {
-                angleRotation = -angleRotation + 180;
+                xDisp = -xDisp;
             }
-            var rect = new Rectangle() { Height = rectWidth, Width = distanceBetweenPoints };
-            var rot = new RotateTransform(angleRotation);
-            rect.Fill = new SolidColorBrush(Colors.Yellow);
-            // Figure out where to place the rectangle top left corner
-            var point1DistanceFromOrigin = Math.Sqrt(Math.Pow(p1.X, 2) + Math.Pow(p1.Y, 2));
-            var rectXOffset = p1.X / point1DistanceFromOrigin * (point1DistanceFromOrigin);
-            var rectYOffset = Math.Cos((angleRotation - 90) * (Math.PI / 180)) * (rectWidth / 2);
-            Canvas.SetLeft(rect, p1.X );
-            Canvas.SetTop(rect, p1.Y * 1.1);
-            // Rotate the rectangle
-            rect.RenderTransform = rot;
-            gameCanvas.Children.Add(rect);
 
-            var el1 = new Ellipse() { Height = 10, Width = 10 };
-            var el2 = new Ellipse() { Height = 10, Width = 10 };
-            el1.Fill = new SolidColorBrush(Colors.Orange);
-            el2.Fill = new SolidColorBrush(Colors.MediumPurple);
-            Canvas.SetLeft(el1, p1.X);
-            Canvas.SetTop(el1, p1.Y);
-            gameCanvas.Children.Add(el1);
-            Canvas.SetLeft(el2, p2.X);
-            Canvas.SetTop(el2, p2.Y);
-            gameCanvas.Children.Add(el2);
+            var poly0 = new Point(p1.X - xDisp, p1.Y + yDisp);
+            var poly1 = new Point(p2.X - xDisp, p2.Y + yDisp);
+            var poly2 = new Point(p2.X + xDisp, p2.Y - yDisp); 
+            var poly3 = new Point(p1.X + xDisp, p1.Y - yDisp);
+
+            var polygon = new Polygon();
+            polygon.Points = new PointCollection() { poly0, poly1, poly2, poly3 };
+            polygon.Fill = new SolidColorBrush(Colors.Yellow);
+            gameCanvas.Children.Add(polygon);
 
 
-            //rect.MouseLeftButtonDown += onRoadLeftClick;
         }
 
+        private void drawVertex(Point p0)
+        {
+            int radius = 12;
+            var elip = new Ellipse() { Height = radius, Width = radius };
+            elip.Fill = new SolidColorBrush(Colors.Black);
+            Canvas.SetLeft(elip, p0.X - radius / 2);
+            Canvas.SetTop(elip, p0.Y - radius / 2);
+            gameCanvas.Children.Add(elip);
+            
+        }
         private void drawHex(double centerpointX, double centerpointY)
         {
             Polygon hexagon = new Polygon();

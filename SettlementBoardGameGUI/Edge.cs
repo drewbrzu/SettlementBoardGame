@@ -10,10 +10,12 @@ namespace SettlementBoardGameGUI
         {
             this.point0 = pt0;
             this.point1 = pt1;
+            this.outsideEdge = true;
         }
 
         public Vertex point0 { get; private set; }
         public Vertex point1 { get; private set; }
         public int ownedBy { get; set; }
+        public bool outsideEdge { get; set; }
     }
 }

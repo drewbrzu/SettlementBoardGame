@@ -15,7 +15,7 @@ namespace SettlementBoardGameGUI
         public double x { get; private set; }
         public double y { get; private set; }
         public int ownedBy { get; set; }
-
+        public ResourceType portType { get; set; }
 
     }
 }
