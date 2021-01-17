@@ -23,55 +23,71 @@ namespace SettlementBoardGameGUI
         {
             var board = new Board(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2));
             gameCanvas.Children.Clear();
-            List<Edge> roads = new List<Edge>();
-            List<Vertex> vertices = new List<Vertex>();
 
-            foreach (var tile in board.tiles)
+            for (int t = 0; t < board.tiles.Count; t++)
             {
                 var col = Colors.Tan;
-                if(tile.resource == ResourceType.Lumber)
+                if(board.tiles[t].resource == ResourceType.Lumber)
                 {
                     col = Colors.Green;
                 }
-                else if(tile.resource == ResourceType.Brick)
+                else if(board.tiles[t].resource == ResourceType.Brick)
                 {
                     col = Colors.DarkRed;
                 }
-                else if (tile.resource == ResourceType.Wool)
+                else if (board.tiles[t].resource == ResourceType.Wool)
                 {
                     col = Colors.Gray;
                 }
-                else if (tile.resource == ResourceType.Grain)
+                else if (board.tiles[t].resource == ResourceType.Grain)
                 {
                     col = Colors.Goldenrod;
                 }
                 PointCollection pc = new PointCollection();
-                foreach (var pt in tile.vertices)
+                foreach (var pt in board.tiles[t].vertices)
                 {
                     pc.Add(new Point(pt.x, pt.y));
                 }
-                drawPolygon(pc, col);
+                var centerpoint = new Point(board.tiles[t].centerpointX, board.tiles[t].centerpointY);
+                var rand = new Random();
+                drawHexagon(pc, col, t, centerpoint, rand.Next(1, 13));
             }
 
-            foreach(var road in board.edges)
+            for(int r = 0; r < board.edges.Count; r++)
             {
-                drawRoad(new Point(road.point0.x, road.point0.y), new Point(road.point1.x, road.point1.y));
+                drawRoad(new Point(board.edges[r].point0.x, board.edges[r].point0.y), new Point(board.edges[r].point1.x, board.edges[r].point1.y), r, board.edges[r].outsideEdge);
             }
 
-            foreach (var vertex in board.vertices)
+            for(int v = 0; v < board.vertices.Count; v++)
             {
-                drawVertex(new Point(vertex.x, vertex.y));
+                drawVertex(new Point(board.vertices[v].x, board.vertices[v].y), v);
             }
         }
-        public void drawPolygon(PointCollection points, Color col)
+        public void drawHexagon(PointCollection points, Color color, int id, Point centerpoint, int rollNumber)
         {
             Polygon hex = new Polygon();
             hex.Points = points;
-            hex.Fill = new SolidColorBrush(col);
+            hex.Fill = new SolidColorBrush(color);
             gameCanvas.Children.Add(hex);
+
+            // Draw circle underneath number:
+            int circleRadius = 12;
+            Ellipse circle = new Ellipse() { Height = circleRadius * 2, Width = circleRadius * 2};
+            circle.Fill = new SolidColorBrush(Colors.White);
+            Canvas.SetLeft(circle, centerpoint.X - circleRadius);
+            Canvas.SetTop(circle, centerpoint.Y - circleRadius);
+            gameCanvas.Children.Add(circle);
+
+            var numText = new TextBlock() { Text = rollNumber.ToString(), FontSize = 14, FontWeight = FontWeights.Bold, Padding = new Thickness(7, 2, 7, 0)};
+            Canvas.SetLeft(numText, centerpoint.X - circleRadius);
+            Canvas.SetTop(numText, centerpoint.Y - circleRadius);
+            gameCanvas.Children.Add(numText);
+
             // TODO: Add events for clicking/hovering over polygon.
+            // Events to handle mouse click
+            hex.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onTileLeftClick(sender, e, id); };
         }
-        public void drawRoad(Point p1, Point p2)
+        public void drawRoad(Point p1, Point p2, int id, bool outsideEdge)
         {
             var rectWidth = 10;
             var xDiff = p2.X - p1.X;
@@ -96,10 +112,11 @@ namespace SettlementBoardGameGUI
             polygon.Fill = new SolidColorBrush(Colors.Yellow);
             gameCanvas.Children.Add(polygon);
 
-
+            // Events to handle mouse click
+            polygon.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onRoadLeftClick(sender, e, id, outsideEdge); };
         }
 
-        private void drawVertex(Point p0)
+        private void drawVertex(Point p0, int id)
         {
             int radius = 12;
             var elip = new Ellipse() { Height = radius, Width = radius };
@@ -107,19 +124,30 @@ namespace SettlementBoardGameGUI
             Canvas.SetLeft(elip, p0.X - radius / 2);
             Canvas.SetTop(elip, p0.Y - radius / 2);
             gameCanvas.Children.Add(elip);
+
+            // Events to handle mouse click
+            elip.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onVertexLeftClick(sender, e, id); };
             
         }
 
-        private void onRoadLeftClick(object sender, MouseButtonEventArgs e)
+        private void onRoadLeftClick(object sender, MouseButtonEventArgs e, int itemId, bool outsideEdge)
         {
-            var road = sender as Rectangle;
+            var road = sender as Polygon;
             road.Fill = new SolidColorBrush(Colors.Red);
+            MessageBox.Show("You clicked road id: " + itemId + ". Outside Edge: " + outsideEdge);
         }
 
-        private void onVertexLeftClick(object sender, MouseButtonEventArgs e)
+        private void onVertexLeftClick(object sender, MouseButtonEventArgs e, int itemId)
         {
             var vertex = sender as Ellipse;
             vertex.Fill = new SolidColorBrush(Colors.Red);
+            MessageBox.Show("You clicked vertex id: " + itemId);
+        }
+
+        private void onTileLeftClick(object sender, MouseButtonEventArgs e, int itemId)
+        {
+            var tile = sender as Polygon;
+            MessageBox.Show("You clicked tile id: " + itemId);
         }
 
         private void pressMeButton_Click(object sender, RoutedEventArgs e)

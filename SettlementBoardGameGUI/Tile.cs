@@ -38,11 +38,16 @@ namespace SettlementBoardGameGUI
             this.resource = resource;
             this.rollNumber = rollNumber;
 
+            this.centerpointX = (pt0.x + pt3.x) / 2.0;
+            this.centerpointY = (pt0.y + pt3.y) / 2.0;
+
         }
 
         public Edge[] edges { get; private set; }
         public Vertex[] vertices { get; private set; }
         public ResourceType resource { get; private set; }
         public int rollNumber { get; private set; }
+        public double centerpointX { get; private set; }
+        public double centerpointY { get; private set; }
     }
 }

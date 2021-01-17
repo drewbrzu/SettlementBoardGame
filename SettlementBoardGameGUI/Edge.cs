@@ -17,5 +17,18 @@ namespace SettlementBoardGameGUI
         public Vertex point1 { get; private set; }
         public int ownedBy { get; set; }
         public bool outsideEdge { get; set; }
+
+        public bool matches(Edge edge)
+        {
+            if(this.point0.matches(edge.point0) && this.point1.matches(edge.point1))
+            {
+                return true;
+            }
+            if(this.point0.matches(edge.point1) && this.point1.matches(edge.point0))
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

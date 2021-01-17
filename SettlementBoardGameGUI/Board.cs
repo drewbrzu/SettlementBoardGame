@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 
@@ -98,6 +99,7 @@ namespace SettlementBoardGameGUI
                 if (i > 0 && i < 5)
                 {
                     edge5 = tiles[tiles.Count - 1].edges[1];
+                    edge5.outsideEdge = false;
                     pt5 = edge5.point1;
                     // edge1 and pt2 are new to the list, but must be added here because for the 5th hex they are not new.
                     edges.Add(edge1);
@@ -107,8 +109,10 @@ namespace SettlementBoardGameGUI
                 else if (i == 5)
                 {
                     edge5 = tiles[tiles.Count - 1].edges[1];
+                    edge5.outsideEdge = false;
                     pt5 = edge5.point1;
                     edge1 = tiles[tiles.Count - 5].edges[5];
+                    edge1.outsideEdge = false;
                     pt2 = edge2.point0;
                 }
                 else 
@@ -131,6 +135,114 @@ namespace SettlementBoardGameGUI
                 // Lastly create a new tile object to store all this information.
                 var tile = new Tile(ref edge0, ref edge1, ref edge2, ref edge3, ref edge4, ref edge5, ref pt0, ref pt1, ref pt2, ref pt3, ref pt4, ref pt5, ResourceType.Brick, 0);
                 tiles.Add(tile);
+            }
+
+            // Now add another circle of hexes surrounding the rest of the map.
+            List<Edge> outsideEdges = new List<Edge>();
+            outsideEdges = edges.Where(e => e.outsideEdge == true).ToList();
+
+            //foreach(var edge in outsideEdges)
+            //{
+            //    var edge0 = edge;
+            //    edge0.outsideEdge = false;
+            //    var pt0 = edge0.point0;
+            //    var pt1 = edge0.point1;
+            //    var pt2 = rotateByAngle(pt1, pt0, -120);
+            //    var pt3 = rotateByAngle(pt2, pt1, -120);
+            //    var pt4 = rotateByAngle(pt3, pt2, -120);
+            //    var pt5 = rotateByAngle(pt4, pt3, -120);
+
+            //    pt2 = findMatchingVertex(vertices, pt2);
+            //    pt3 = findMatchingVertex(vertices, pt3);
+            //    pt4 = findMatchingVertex(vertices, pt4);
+            //    pt5 = findMatchingVertex(vertices, pt5);
+
+            //    var edge1 = new Edge(ref pt1, ref pt2);
+            //    var edge2 = new Edge(ref pt2, ref pt3);
+            //    var edge3 = new Edge(ref pt3, ref pt4);
+            //    var edge4 = new Edge(ref pt4, ref pt5);
+            //    var edge5 = new Edge(ref pt5, ref pt0);
+
+            //    var currentEdgeCount = edges.Count;
+            //    edge1 = findMatchingEdge(edges, edge1);
+            //    edge2 = findMatchingEdge(edges, edge2);
+            //    edge3 = findMatchingEdge(edges, edge3);
+            //    edge4 = findMatchingEdge(edges, edge4);
+            //    edge5 = findMatchingEdge(edges, edge5);
+
+            //     If all of the edges have matches and no new edges were added to the list then it means this tile has already been created so it should not be added again.
+            //    if (currentEdgeCount != edges.Count)
+            //    {
+            //         Create a new tile object to store all this information.
+            //        var tile = new Tile(ref edge0, ref edge1, ref edge2, ref edge3, ref edge4, ref edge5, ref pt0, ref pt1, ref pt2, ref pt3, ref pt4, ref pt5, ResourceType.Brick, 0);
+            //        tiles.Add(tile);
+            //    }
+            //}
+
+            foreach (var edge in outsideEdges)//for (int e = 0; e < 6; e++)
+            {
+                //var edge0 = outsideEdges[e];
+                var edge0 = edge;
+                edge0.outsideEdge = false;
+                var pt0 = edge0.point0;
+                var pt1 = edge0.point1;
+                var pt2 = rotateByAngle(pt1, pt0, -120);
+                var pt3 = rotateByAngle(pt2, pt1, -120);
+                var pt4 = rotateByAngle(pt3, pt2, -120);
+                var pt5 = rotateByAngle(pt4, pt3, -120);
+
+                var currentVertexCount = vertices.Count;
+                pt2 = findMatchingVertex(vertices, pt2);
+                pt3 = findMatchingVertex(vertices, pt3);
+                pt4 = findMatchingVertex(vertices, pt4);
+                pt5 = findMatchingVertex(vertices, pt5);
+
+                // If all of the vertices have matches and no new vertices were added to the list then it means this tile has already been created so it should not be added again.
+                if (vertices.Count > currentVertexCount)
+                {
+                    var edge1 = new Edge(ref pt1, ref pt2);
+                    var edge2 = new Edge(ref pt2, ref pt3);
+                    var edge3 = new Edge(ref pt3, ref pt4);
+                    var edge4 = new Edge(ref pt4, ref pt5);
+                    var edge5 = new Edge(ref pt5, ref pt0);
+
+                    var currentEdgeCount = edges.Count;
+                    edge1 = findMatchingEdge(edges, edge1);
+                    edge2 = findMatchingEdge(edges, edge2);
+                    edge3 = findMatchingEdge(edges, edge3);
+                    edge4 = findMatchingEdge(edges, edge4);
+                    edge5 = findMatchingEdge(edges, edge5);
+
+                    //Create a new tile object to store all this information.
+                    var tile = new Tile(ref edge0, ref edge1, ref edge2, ref edge3, ref edge4, ref edge5, ref pt0, ref pt1, ref pt2, ref pt3, ref pt4, ref pt5, ResourceType.Brick, 0);
+                    tiles.Add(tile);
+                }
+            }
+        }
+
+        private Vertex findMatchingVertex(List<Vertex> vertexList, Vertex newVertex)
+        {
+            var matchVertex = vertexList.Where(list => list.x == newVertex.x && list.y == newVertex.y).FirstOrDefault();
+            if(matchVertex == null)
+            {
+                matchVertex = newVertex;
+                vertexList.Add(matchVertex);
+            }
+            return matchVertex;
+        }
+
+        private Edge findMatchingEdge(List<Edge> edgeList, Edge newEdge)
+        {
+            var matchEdge = edgeList.Where(list => list.matches(newEdge)).FirstOrDefault();
+            if (matchEdge == null)
+            {
+                edgeList.Add(newEdge);
+                return newEdge;
+            }
+            else
+            {
+                matchEdge.outsideEdge = false;
+                return matchEdge;
             }
         }
 
