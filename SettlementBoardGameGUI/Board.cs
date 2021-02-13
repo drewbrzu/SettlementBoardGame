@@ -16,6 +16,7 @@ namespace SettlementBoardGameGUI
         public List<Tile> tiles { get; private set; }
         public List<Edge> edges { get; private set; }
         public List<Vertex> vertices { get; private set; }
+        public List<Player> players { get; private set; }
 
         private void InitializeBoard(double screenCenterX, double screenCenterY)
         {
@@ -220,6 +221,31 @@ namespace SettlementBoardGameGUI
             }
         }
 
+        private Vertex[] findVerticesMatchingRoll(int diceRoll)
+        {
+            var vertexList = new List<Vertex>();
+            foreach(var tile in tiles)
+            {
+                if(tile.rollNumber == diceRoll)
+                {
+                    // TODO: This might be a good opportunity to cache the results of which vertices match a given roll.
+                    // Loop through all vertices that are owned by a player.
+                    foreach (var vertex in tile.vertices.Where(pt => pt.ownedBy != 0))
+                    {
+                        // Give resource to player who owns the vertex.
+                        // If a city is built on the vertex, then give 2 resource cards.
+                        if(vertex.settlementSize == 2)
+                        {
+                            players[vertex.ownedBy + 1].resourceCards.Add(tile.resource);
+                        }
+                        players[vertex.ownedBy + 1].resourceCards.Add(tile.resource);
+
+                    }
+                }
+            }
+            
+            return null;
+        }
         private Vertex findMatchingVertex(List<Vertex> vertexList, Vertex newVertex)
         {
             var matchVertex = vertexList.Where(list => list.x == newVertex.x && list.y == newVertex.y).FirstOrDefault();

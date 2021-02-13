@@ -14,14 +14,27 @@ namespace SettlementBoardGameGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        Game myGame;
+        Dictionary<int, Color> playerColors;
         public MainWindow()
         {
             InitializeComponent();
+            myGame = new Game(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2), 3, 0);
+            
+            playerColors = new Dictionary<int, Color>();
+            // TODO: Make player colors match on ID, maybe add way to pick color, or make it random. For now just assume playerId goes from 1 - 4 (max of 4 players).
+            playerColors.Add(0, Colors.DarkGray);
+            playerColors.Add(1, Colors.Red);
+            playerColors.Add(2, Colors.Blue);
+            playerColors.Add(3, Colors.Green);
+            playerColors.Add(4, Colors.Orange);
+
             drawBoard();
         }
         public void drawBoard()
         {
-            var board = new Board(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2));
+            //board = new Game(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2), 2, 0);
+            var board = myGame.gameBoard;
             gameCanvas.Children.Clear();
 
             for (int t = 0; t < board.tiles.Count; t++)
@@ -60,7 +73,7 @@ namespace SettlementBoardGameGUI
 
             for(int v = 0; v < board.vertices.Count; v++)
             {
-                drawVertex(new Point(board.vertices[v].x, board.vertices[v].y), v);
+                drawVertex(new Point(board.vertices[v].x, board.vertices[v].y), v, playerColors[board.vertices[v].ownedBy]);
             }
         }
         public void drawHexagon(PointCollection points, Color color, int id, Point centerpoint, int rollNumber)
@@ -109,18 +122,18 @@ namespace SettlementBoardGameGUI
 
             var polygon = new Polygon();
             polygon.Points = new PointCollection() { poly0, poly1, poly2, poly3 };
-            polygon.Fill = new SolidColorBrush(Colors.Yellow);
+            polygon.Fill = new SolidColorBrush(Colors.Gray);
             gameCanvas.Children.Add(polygon);
 
             // Events to handle mouse click
             polygon.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onRoadLeftClick(sender, e, id, outsideEdge); };
         }
 
-        private void drawVertex(Point p0, int id)
+        private void drawVertex(Point p0, int id, Color color)
         {
             int radius = 12;
             var elip = new Ellipse() { Height = radius, Width = radius };
-            elip.Fill = new SolidColorBrush(Colors.Black);
+            elip.Fill = new SolidColorBrush(color);
             Canvas.SetLeft(elip, p0.X - radius / 2);
             Canvas.SetTop(elip, p0.Y - radius / 2);
             gameCanvas.Children.Add(elip);
@@ -130,18 +143,75 @@ namespace SettlementBoardGameGUI
             
         }
 
+
+        private void loadPlayerScreen()
+        {
+            int lumber = 0, brick = 0, grain = 0, wool = 0, ore = 0;
+            // load information for current player
+            foreach(var card in myGame.currentPlayer().resourceCards)
+            {
+                switch (card)
+                {
+                    case ResourceType.Lumber:
+                        lumber++;
+                        break;
+                    case ResourceType.Brick:
+                        brick++;
+                        break;
+                    case ResourceType.Grain:
+                        grain++;
+                        break;
+                    case ResourceType.Wool:
+                        wool++;
+                        break;
+                    case ResourceType.Ore:
+                        ore++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            var devcardList = myGame.currentPlayer().developmentCards;
+
+            lumberCountTextBlock.Text = lumber.ToString();
+            brickCountTextBlock.Text = brick.ToString();
+            grainCountTextBlock.Text = grain.ToString();
+            woolCountTextBlock.Text = wool.ToString();
+            oreCountTextBlock.Text = ore.ToString();
+            devcardCountTextBlock.Text = devcardList.Count.ToString();
+        }
+
+        private void clearPlayerScreen()
+        {
+
+
+            lumberCountTextBlock.Text = "0";
+            brickCountTextBlock.Text = "0";
+            grainCountTextBlock.Text = "0";
+            woolCountTextBlock.Text = "0";
+            oreCountTextBlock.Text = "0";
+            devcardCountTextBlock.Text = "0";
+        }
+
         private void onRoadLeftClick(object sender, MouseButtonEventArgs e, int itemId, bool outsideEdge)
         {
             var road = sender as Polygon;
-            road.Fill = new SolidColorBrush(Colors.Red);
+            //road.Fill = new SolidColorBrush(Colors.Red);
             MessageBox.Show("You clicked road id: " + itemId + ". Outside Edge: " + outsideEdge);
         }
 
         private void onVertexLeftClick(object sender, MouseButtonEventArgs e, int itemId)
         {
             var vertex = sender as Ellipse;
-            vertex.Fill = new SolidColorBrush(Colors.Red);
+            //vertex.Fill = new SolidColorBrush(Colors.Red);
             MessageBox.Show("You clicked vertex id: " + itemId);
+            if (!myGame.buildSettlement(itemId))
+            {
+                MessageBox.Show("You don't have enough resources to build that.");
+                return;
+            }
+            loadPlayerScreen();
+            drawBoard();
         }
 
         private void onTileLeftClick(object sender, MouseButtonEventArgs e, int itemId)
@@ -152,8 +222,33 @@ namespace SettlementBoardGameGUI
 
         private void pressMeButton_Click(object sender, RoutedEventArgs e)
         {
-
+            loadPlayerScreen();
             
+        }
+
+        private void rollDiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            var roll = myGame.rollDice();
+            MessageBox.Show("You rolled a " + roll.ToString());
+        }
+
+        private void endTurnButton_Click(object sender, RoutedEventArgs e)
+        {
+            myGame.nextTurn();
+
+            // Hide player information shown at bottom of screen.
+            clearPlayerScreen();
+
+            // Show pop up telling next player to sit down.
+            MessageBox.Show(myGame.currentPlayer().playerName + " it is your turn.");
+
+            // Update screen for next player.
+            loadPlayerScreen();
+        }
+
+        private void buildButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

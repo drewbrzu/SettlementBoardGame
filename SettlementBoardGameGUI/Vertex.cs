@@ -16,6 +16,7 @@ namespace SettlementBoardGameGUI
         public double y { get; private set; }
         public int ownedBy { get; set; }
         public ResourceType portType { get; set; }
+        public int settlementSize { get; set; }
 
         public bool matches(Vertex vert)
         {

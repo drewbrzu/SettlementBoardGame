@@ -1,0 +1,28 @@
+﻿<Window x:Class="SettlementBoardGameGUI.BuildWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SettlementBoardGameGUI"
+        mc:Ignorable="d"
+        Title="BuildWindow" Height="150" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="10" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <TextBlock Margin="5" FontSize="10" FontFamily="Segoe UI" Text="What would you like to build?"></TextBlock>
+            <Button x:Name="buildRoadButton" Content="Build Road" />
+            <Button x:Name="buildSettlementButton" Content="Build Settlement" />
+            <Button x:Name="buildCityButton" Content="Build City" />
+            
+        </StackPanel>
+    </Grid>
+</Window>

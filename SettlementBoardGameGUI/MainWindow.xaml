@@ -37,20 +37,52 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <!-- Player and VP labels-->
-            <Border Grid.Column="0" Grid.Row="0" BorderThickness="1" BorderBrush="Black">
-                <TextBlock Grid.Column="0" Grid.Row="0" MinWidth="200" Margin="5" FontSize="20" FontFamily="Segoe UI" Text="PLAYER: 1"></TextBlock>
+            <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="Black">
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" MinWidth="200" Margin="5" FontSize="20" FontFamily="Segoe UI" Text="PLAYER: 1"></TextBlock>
             </Border>
-            <Border Grid.Column="1" Grid.Row="0" BorderThickness="1" BorderBrush="Black">
-                <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" FontSize="20" FontFamily="Segoe UI" Text="VICTORY POINTS: 2"></TextBlock>
+            <Border Grid.Column="3" Grid.Row="0" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="Black">
+                <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Margin="5" FontSize="20" FontFamily="Segoe UI" Text="VICTORY POINTS: 2"></TextBlock>
             </Border>
-            <Button x:Name="pressMeButton" Grid.Column="0" Grid.Row="1" Content="Press Me" Click="pressMeButton_Click" />
 
+            <TextBlock Name="lumberCountTextBlock" Grid.Column="0" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="brickCountTextBlock" Grid.Column="1" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="grainCountTextBlock" Grid.Column="2" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="woolCountTextBlock" Grid.Column="3" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="oreCountTextBlock" Grid.Column="4" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="devcardCountTextBlock" Grid.Column="5" Grid.Row="1" Text="0" HorizontalAlignment="Center"></TextBlock>
+
+            <Image Source="resources/images/wood.png" Grid.Column="0" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+            <Image Source="resources/images/brick.png" Grid.Column="1" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+            <Image Source="resources/images/wheat.png" Grid.Column="2" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+            <Image Source="resources/images/wool.png" Grid.Column="3" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+            <Image Source="resources/images/stone.png" Grid.Column="4" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+            <Image Source="resources/images/devcard.png" Grid.Column="5" Grid.Row="2" Height="auto" Width="70" Margin="2,2" />
+
+            <Border Grid.Column="8" Grid.Row="0" Grid.RowSpan="3" BorderThickness="1" BorderBrush="Black">
+                <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" FontSize="20" FontFamily="Segoe UI" Text="ACTIONS:"></TextBlock>
+            </Border>
+            <StackPanel Grid.Column="8" Grid.Row="2">
+                <Button x:Name="pressMeButton" Content="Press Me" Click="pressMeButton_Click" />
+                <Button x:Name="rollDiceButton" Content="Roll Dice" Click="rollDiceButton_Click" />
+                <Button x:Name="buildButton" Content="Build" Click="buildButton_Click" />
+                <Button x:Name="endTurnButton" Content="End Turn" Click="endTurnButton_Click" />
+            </StackPanel>
 
         </Grid>
     </Grid>
