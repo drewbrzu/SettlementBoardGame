@@ -9,6 +9,14 @@ using System.Windows.Shapes;
 
 namespace SettlementBoardGameGUI
 {
+    public enum BuildOption
+    {
+        None,
+        Road,
+        Settlement,
+        City
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -16,6 +24,8 @@ namespace SettlementBoardGameGUI
     {
         Game myGame;
         Dictionary<int, Color> playerColors;
+
+        private bool buildMode = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -36,6 +46,7 @@ namespace SettlementBoardGameGUI
             //board = new Game(new Point(gameCanvas.Width / 2, gameCanvas.Height / 2), 2, 0);
             var board = myGame.gameBoard;
             gameCanvas.Children.Clear();
+            Color entityColor = Colors.LightBlue;
 
             for (int t = 0; t < board.tiles.Count; t++)
             {
@@ -68,14 +79,26 @@ namespace SettlementBoardGameGUI
 
             for(int r = 0; r < board.edges.Count; r++)
             {
-                drawRoad(new Point(board.edges[r].point0.x, board.edges[r].point0.y), new Point(board.edges[r].point1.x, board.edges[r].point1.y), r, board.edges[r].outsideEdge);
+                entityColor = playerColors[board.edges[r].ownedBy];
+                if (board.edges[r].ownedBy == 0)
+                {
+                    entityColor = Colors.LightBlue;
+                }
+                drawRoad(new Point(board.edges[r].point0.x, board.edges[r].point0.y), new Point(board.edges[r].point1.x, board.edges[r].point1.y), r, entityColor);
             }
 
             for(int v = 0; v < board.vertices.Count; v++)
             {
-                drawVertex(new Point(board.vertices[v].x, board.vertices[v].y), v, playerColors[board.vertices[v].ownedBy]);
+                // If the vertex is not owned by anyone, then use the default color, otherwise use the color of the player who owns it. 
+                entityColor = playerColors[board.vertices[v].ownedBy];
+                if (board.vertices[v].ownedBy == 0)
+                {
+                    entityColor = Colors.Cyan;
+                }
+                drawVertex(new Point(board.vertices[v].x, board.vertices[v].y), v, entityColor);
             }
         }
+
         public void drawHexagon(PointCollection points, Color color, int id, Point centerpoint, int rollNumber)
         {
             Polygon hex = new Polygon();
@@ -100,7 +123,7 @@ namespace SettlementBoardGameGUI
             // Events to handle mouse click
             hex.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onTileLeftClick(sender, e, id); };
         }
-        public void drawRoad(Point p1, Point p2, int id, bool outsideEdge)
+        public void drawRoad(Point p1, Point p2, int id, Color color)
         {
             var rectWidth = 10;
             var xDiff = p2.X - p1.X;
@@ -122,11 +145,11 @@ namespace SettlementBoardGameGUI
 
             var polygon = new Polygon();
             polygon.Points = new PointCollection() { poly0, poly1, poly2, poly3 };
-            polygon.Fill = new SolidColorBrush(Colors.Gray);
+            polygon.Fill = new SolidColorBrush(color);
             gameCanvas.Children.Add(polygon);
 
             // Events to handle mouse click
-            polygon.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onRoadLeftClick(sender, e, id, outsideEdge); };
+            polygon.MouseLeftButtonDown += delegate (object sender, MouseButtonEventArgs e) { onRoadLeftClick(sender, e, id); };
         }
 
         private void drawVertex(Point p0, int id, Color color)
@@ -193,25 +216,38 @@ namespace SettlementBoardGameGUI
             devcardCountTextBlock.Text = "0";
         }
 
-        private void onRoadLeftClick(object sender, MouseButtonEventArgs e, int itemId, bool outsideEdge)
+        private void onRoadLeftClick(object sender, MouseButtonEventArgs e, int itemId)
         {
             var road = sender as Polygon;
-            //road.Fill = new SolidColorBrush(Colors.Red);
-            MessageBox.Show("You clicked road id: " + itemId + ". Outside Edge: " + outsideEdge);
+            if (buildMode)
+            {
+                MessageBox.Show("You clicked road id: " + itemId);
+                if (!myGame.buildRoad(itemId))
+                {
+                    MessageBox.Show("You don't have enough resources to build that.");
+                    return;
+                }
+                buildMode = false;
+                loadPlayerScreen();
+                drawBoard();
+            }
         }
 
         private void onVertexLeftClick(object sender, MouseButtonEventArgs e, int itemId)
         {
             var vertex = sender as Ellipse;
-            //vertex.Fill = new SolidColorBrush(Colors.Red);
-            MessageBox.Show("You clicked vertex id: " + itemId);
-            if (!myGame.buildSettlement(itemId))
+            if (buildMode)
             {
-                MessageBox.Show("You don't have enough resources to build that.");
-                return;
+                MessageBox.Show("You clicked vertex id: " + itemId);
+                if (!myGame.buildSettlement(itemId))
+                {
+                    MessageBox.Show("You don't have enough resources to build that.");
+                    return;
+                }
+                buildMode = false;
+                loadPlayerScreen();
+                drawBoard();
             }
-            loadPlayerScreen();
-            drawBoard();
         }
 
         private void onTileLeftClick(object sender, MouseButtonEventArgs e, int itemId)
@@ -248,7 +284,14 @@ namespace SettlementBoardGameGUI
 
         private void buildButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //var buildForm = new BuildWindow();
+            //if(buildForm.ShowDialog() == true)
+            //{
+            //    // Enter Build mode
+            //    buildMode = true;
+            //}
+            MessageBox.Show("You're now in build mode. Click to build a road, settlement, or city.");
+            buildMode = true;
         }
     }
 }

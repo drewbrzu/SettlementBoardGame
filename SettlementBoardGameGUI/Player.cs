@@ -42,6 +42,14 @@ namespace SettlementBoardGameGUI
             resourceCards.Add(ResourceType.Brick);
             resourceCards.Add(ResourceType.Wool);
             resourceCards.Add(ResourceType.Grain);
+            resourceCards.Add(ResourceType.Lumber);
+            resourceCards.Add(ResourceType.Brick);
+            resourceCards.Add(ResourceType.Wool);
+            resourceCards.Add(ResourceType.Grain);
+            resourceCards.Add(ResourceType.Lumber);
+            resourceCards.Add(ResourceType.Brick);
+            resourceCards.Add(ResourceType.Lumber);
+            resourceCards.Add(ResourceType.Brick);
         }
 
         public PlayerType playerType { get; private set; }
