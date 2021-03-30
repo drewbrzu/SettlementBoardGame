@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SettlementBoardGameGUI
@@ -10,10 +11,13 @@ namespace SettlementBoardGameGUI
         {
             this.x = Math.Round(x, 3);
             this.y = Math.Round(y, 3);
+            this.connectedEdges = new List<Edge>();
         }
 
         public double x { get; private set; }
         public double y { get; private set; }
+
+        public List<Edge> connectedEdges { get; protected set; }
         public int ownedBy { get; set; }
         public ResourceType portType { get; set; }
         public int settlementSize { get; set; }
@@ -25,6 +29,10 @@ namespace SettlementBoardGameGUI
                 return true;
             }
             return false;
+        }
+        public Edge getConnectedEdge(Vertex point)
+        {
+            return this.connectedEdges.Where(edge => (edge.point0.x == point.x && edge.point0.y == point.y) || (edge.point1.x == point.x && edge.point1.y == point.y)).FirstOrDefault();
         }
 
     }

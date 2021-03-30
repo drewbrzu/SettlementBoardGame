@@ -77,17 +77,17 @@ namespace SettlementBoardGameGUI
                 else
                 {
                     // 
-                    foreach (var edge in getEdgesConnectedToVertex(gameBoard.vertices.IndexOf(gameBoard.edges[edgeId].point0)))
+                    foreach (var edge in gameBoard.edges[edgeId].point0.connectedEdges)
                     {
-                        if (gameBoard.edges[edge].ownedBy == currentPlayer().playerId)
+                        if (edge.ownedBy == currentPlayer().playerId)
                         {
                             valid = true;
                         }
                     }
 
-                    foreach (var edge in getEdgesConnectedToVertex(gameBoard.vertices.IndexOf(gameBoard.edges[edgeId].point1)))
+                    foreach (var edge in gameBoard.edges[edgeId].point1.connectedEdges)
                     {
-                        if (gameBoard.edges[edge].ownedBy == currentPlayer().playerId)
+                        if (edge.ownedBy == currentPlayer().playerId)
                         {
                             valid = true;
                         }

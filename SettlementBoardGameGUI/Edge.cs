@@ -11,6 +11,8 @@ namespace SettlementBoardGameGUI
             this.point0 = pt0;
             this.point1 = pt1;
             this.outsideEdge = true;
+            pt0.connectedEdges.Add(this);
+            pt1.connectedEdges.Add(this);
         }
 
         public Vertex point0 { get; private set; }

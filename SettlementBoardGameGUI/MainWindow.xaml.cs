@@ -236,6 +236,7 @@ namespace SettlementBoardGameGUI
         private void onVertexLeftClick(object sender, MouseButtonEventArgs e, int itemId)
         {
             var vertex = sender as Ellipse;
+            MessageBox.Show("This has " + myGame.gameBoard.vertices[itemId].connectedEdges.Count.ToString() + "connected edges");
             if (buildMode)
             {
                 MessageBox.Show("You clicked vertex id: " + itemId);
