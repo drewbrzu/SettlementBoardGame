@@ -239,10 +239,11 @@ namespace SettlementBoardGameGUI
             MessageBox.Show("This has " + myGame.gameBoard.vertices[itemId].connectedEdges.Count.ToString() + "connected edges");
             if (buildMode)
             {
-                MessageBox.Show("You clicked vertex id: " + itemId);
-                if (!myGame.buildSettlement(itemId))
+                //MessageBox.Show("You clicked vertex id: " + itemId);
+                var response = myGame.buildSettlement(itemId);
+                if (!response.Item1)
                 {
-                    MessageBox.Show("You don't have enough resources to build that.");
+                    MessageBox.Show(response.Item2);
                     return;
                 }
                 buildMode = false;

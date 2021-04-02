@@ -18,10 +18,14 @@ namespace SettlementBoardGameGUI
         public List<Vertex> vertices { get; private set; }
         public List<Player> players { get; private set; }
         
-        //private Dictionary<Vertex, >
 
         private void InitializeBoard(double screenCenterX, double screenCenterY)
         {
+            // DOCUMENTATION ON GRAPH DATA STRUCTURES:
+            // https://cis300.cs.ksu.edu/graphs/impl/
+            // https://docs.microsoft.com/en-us/previous-versions/ms379574(v=vs.80)?redirectedfrom=MSDN#datastructures20_5_topic3
+            //
+
             double x, y, xOffset, yOffset, edgeLength;
             double sine60 = Math.Sin(60.0 / 180.0 * Math.PI);
             double cosine60 = Math.Cos(60.0 / 180.0 * Math.PI);

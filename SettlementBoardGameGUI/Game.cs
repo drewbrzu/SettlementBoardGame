@@ -28,6 +28,7 @@ namespace SettlementBoardGameGUI
             playersTurn = 1;
 
             // TODO: Have players place initial settlements
+            gameInitialRound = true;
 
         }
 
@@ -35,6 +36,7 @@ namespace SettlementBoardGameGUI
         public Board gameBoard { get; private set; }
 
         private int playersTurn;
+        private bool gameInitialRound = true;
 
         public Player currentPlayer()
         {
@@ -76,20 +78,13 @@ namespace SettlementBoardGameGUI
                 }
                 else
                 {
-                    // 
-                    foreach (var edge in gameBoard.edges[edgeId].point0.connectedEdges)
+                    // Check all edges connected to this edgeId to see if any are owned by the current player.
+                    foreach (var edge in gameBoard.edges[edgeId].point0.connectedEdges.Concat(gameBoard.edges[edgeId].point1.connectedEdges))
                     {
                         if (edge.ownedBy == currentPlayer().playerId)
                         {
                             valid = true;
-                        }
-                    }
-
-                    foreach (var edge in gameBoard.edges[edgeId].point1.connectedEdges)
-                    {
-                        if (edge.ownedBy == currentPlayer().playerId)
-                        {
-                            valid = true;
+                            break;
                         }
                     }
                 }
@@ -107,30 +102,38 @@ namespace SettlementBoardGameGUI
             return false;
         }
 
-        private int[] getEdgesConnectedToVertex(int vertexId)
-        {
-            var edges = gameBoard.edges.Where(e => e.point0 == gameBoard.vertices[vertexId] || e.point1 == gameBoard.vertices[vertexId]).ToList();
-            int[] edgeIndices = new int[edges.Count];
-            for(int i = 0; i < edges.Count; i++)
-            {
-                edgeIndices[i] = gameBoard.edges.IndexOf(edges[i]);
-            }
-            return edgeIndices;
-        }
-
-        public bool buildSettlement(int vertexId)
+        public Tuple<bool, string> buildSettlement(int vertexId)
         {
             // Check if the selected vertex is a valid place for the current player to build a road.
             bool valid = false;
             if (gameBoard.vertices[vertexId].ownedBy == 0)
             {
-                foreach(var edge in getEdgesConnectedToVertex(vertexId))
+                foreach(var edge in gameBoard.vertices[vertexId].connectedEdges)
                 {
-                    if (gameBoard.edges[edge].ownedBy == currentPlayer().playerId)
+                    // Make sure there are no settlements on adjacent vertices. (There must be at least 2 roads between each settlement).
+                    if (edge.point0.ownedBy != 0 || edge.point1.ownedBy != 0)
+                    {
+                        return new Tuple<bool, string>(false, "Settlements must be placed at least 2 roads away from another settlement.");
+                    }
+                    // Make sure there is at least 1 adjacent edge which is owned by the current player. (Settlements must connect to roads).
+                    if (edge.ownedBy == currentPlayer().playerId)
+                    {
+                        valid = true;
+                    }
+                    // For the initial setup of the game, settlements can be placed anywhere. They don't need to be connected to an existing road.
+                    if (gameInitialRound)
                     {
                         valid = true;
                     }
                 }
+                if (!valid)
+                {
+                    return new Tuple<bool, string>(false, "A new settlement must be connected to a road you own.");
+                }
+            }
+            else
+            {
+                return new Tuple<bool, string>(false, "A settlement is already built on this space.");
             }
 
             // Make sure the player has enough resources to build this settlement.
@@ -145,9 +148,9 @@ namespace SettlementBoardGameGUI
                 currentPlayer().resourceCards.Remove(ResourceType.Brick);
                 currentPlayer().resourceCards.Remove(ResourceType.Wool);
                 currentPlayer().resourceCards.Remove(ResourceType.Grain);
-                return true;
+                return new Tuple<bool, string>(true, "You successfully built a settlement!");
             }
-             return false;
+            return new Tuple<bool, string>(false, "You do not have enough resources to built a settlement.");
         }
 
         public bool buildCity(int vertexId)
